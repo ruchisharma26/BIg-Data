@@ -1,0 +1,23 @@
+hadoop fs -copyFromLocal /home/maria_dev/foodratings45679.txt /user/maria_dev 
+
+sc = SparkContext.getOrCreate()
+ex1RDD=sc.textFile('/user/maria_dev/foodratings45679.txt')
+ex1RDD.take(5)
+
+ex2RDD=ex1RDD.map(lambda line: line.split(","))
+ex2RDD.take(5)
+
+ex3RDD=ex2RDD.map(lambda line : [line[0], line[1], int(line[2]), line[3], line[4], line[5]])
+ex3RDD.take(5)
+
+
+ex4RDD=ex3RDD.map(lambda line : line[2]<25)
+ex4RDD=ex3RDD.filter(lambda line : line[2]<25)
+ex4RDD.take(5)
+
+
+ex5RDD=ex4RDD.map(lambda line : (line[0], line))
+ex5RDD.take(5)
+
+ex6RDD=ex5RDD.sortByKey(True)
+ex6RDD.take(5)

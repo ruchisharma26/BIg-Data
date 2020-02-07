@@ -1,0 +1,60 @@
+hadoop fs -copyFromLocal /home/maria_dev/foodratings9149.txt /user/maria_dev/foodratings9149.csv
+hadoop fs -copyFromLocal /home/maria_dev/foodplaces9149.txt /user/maria_dev/foodplaces9149.csv
+
+to go in python in spark it is pyspark
+ from pyspak.sql.types import *
+struct1 = StructType(
+[
+StructField("name", StringType(), True),
+StructField("food1",IntegerType(), True),
+StructField("food2",IntegerType(), True),
+StructField("food3",IntegerType(), True),
+StructField("food4",IntegerType(), True),
+StructField("placeid",IntegerType(), True)
+]
+)
+
+foodratings = spark.read.schema(struct1).csv('/user/maria_dev/foodratings9149.csv')
+foodratings.show()
+foodratings.printSchema()
+foodratings.head(5)
+
+
+struct2 = StructType(
+[
+StructField("placeid", IntegerType(), True),
+StructField("placename", StringType(), True)
+]
+)
+foodplaces = spark.read.schema(struct2).csv('/user/maria_dev/foodplaces9149.csv')
+foodplaces.printSchema()
+foodplaces.head(5)
+
+
+foodratings.registerTempTable('foodratingsT')
+foodplaces.registerTempTable('foodplacesT')
+foodratings_ex3=sqlContext.sql("SELECT * FROM foodratingsT WHERE food2<25 AND food4>40")
+foodratings_ex3.head(5)
+foodratings_ex3.printSchema()
+foodplaces_ex3=sqlContext.sql("SELECT * FROM foodplacesT WHERE placeid>3")
+foodplaces_ex3.printSchema()
+foodplaces_ex3.head(5)
+
+
+foodratings_ex4=foodratings.filter((foodratings['name']=='Mel')&(foodratings['food3']<25))
+foodratings_ex4.printSchema()
+foodratings_ex4.head(5)
+
+
+foodratings_ex5=foodratings.filter((foodratings['name']=='Mel')&(foodratings['food3']<25))
+foodratings_ex4.printSchema()
+foodratings_ex4.head(5)
+
+foodratings_ex5=foodratings.select(foodratings['name'], foodratings['placeid'])
+foodratings_ex5.printSchema()
+foodratings_ex5.head(5)
+
+
+ex6 = foodratings.join(foodplaces,foodratings.placeid==foodplaces.placeid, 'inner')
+ex6.printSchema()
+ex6.head(5)

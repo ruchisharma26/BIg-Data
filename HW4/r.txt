@@ -1,0 +1,35 @@
+scp -P 2222 ~/Desktop/BigData/HW4/TestDataGen.class maria_dev@localhost:/home/maria_dev
+
+hive> CREATE DATABASE IF NOT EXISTS MyDb;
+
+
+CREATE TABLE IF NOT EXISTS foodratings( name String, food1 int, food2 int, food3 int, food4 int, id int)
+
+LOAD DATA LOCAL INPATH '/home/maria_dev/foodratings125235.txt' OVERWRITE INTO TABLE foodratings;
+SELECT min(food3), max(food3), avg(food3) from foodratings;
+
+Select name,min(food1),max(food1),avg(food1) from foodratings GROUP BY foodratings.name;
+
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=non-strict
+
+
+INSERT OVERWRITE TABLE foodratingspart
+PARTITION (name)
+SELECT food1,food2,food3,food4,id,name
+FROM foodratings;
+
+Select min(food2),max(food2),avg(food2) from foodratingspart where name='Mel'or name='Jill';
+
+LOAD DATA LOCAL INPATH '/home/maria_dev/foodplaces125235.txt' OVERWRITE INTO TABLE
+foodplaces;
+SELECT b.place avg(a.food4)
+FROM foodratings a JOIN foodplaces b ON a.id = b.id
+where b.place='Soup Bowl'
+GROUP BY b.place;
+
+
+
+
+
+

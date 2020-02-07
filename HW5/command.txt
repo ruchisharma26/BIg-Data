@@ -1,0 +1,18 @@
+hadoop fs -copyFromLocal /home/maria_dev/foodratings48541.txt /user/maria_dev 
+hadoop fs -copyFromLocal /home/maria_dev/foodplaces48541.txt /user/maria_dev 
+1:
+food_ratings = LOAD 'foodratings48541.txt' USING PigStorage(',') AS
+(name:chararray,f1:int,f2:int,f3:int,f4:int,placeid:int);
+DESCRIBE food_ratings;
+5:
+food_ratings_2percent = SAMPLE food_ratings 0.02;
+result = LIMIT food_ratings_2percent 10;
+DUMP result;
+
+6:
+food_places = LOAD 'foodplaces48541.txt' USING PigStorage(',') AS
+(placeid:int,placename:chararray);
+DESCRIBE food_places;
+food_ratings_w_place_names = JOIN food_ratings BY placeid,food_places BY placeid;
+result= LIMIT food_ratings_w_place_names 6;
+DUMP result;
